@@ -5,12 +5,14 @@ Created on Thu Jan 23 20:04:56 2020
 @author: iles_
 """
 from utility.hash_util import hash_block, hash_string_256
+from wallet import Wallet
+
 
 class Verification:
     @classmethod
     def verify_chain(cls, blockchain):
         """ Verify the current blockchain and return True if valid, False otherwise."""
-        for (index,block) in enumerate(blockchain):
+        for (index, block) in enumerate(blockchain):
             if index == 0:
                 continue
             if block.previous_hash != hash_block(blockchain[index - 1]):
@@ -19,20 +21,23 @@ class Verification:
                 print('Proof of work invalid!')
                 return False
         return True
-    
+
     @classmethod
     def verify_transactions(cls, open_transactions, get_balance):
-        return all([cls.verify_transaction(tx, get_balance) for tx in open_transactions])
-    
-    @staticmethod  
-    def verify_transaction(transaction, get_balance):
-        sender_balance = get_balance()
-        return sender_balance >= float(transaction.amount)
-    
+        return all([cls.verify_transaction(tx, get_balance, False) for tx in open_transactions])
+
+    @staticmethod
+    def verify_transaction(transaction, get_balance, check_funds=True):
+        if check_funds:
+            sender_balance = get_balance(transaction.sender)
+            return sender_balance >= transaction.amount and Wallet.verify_signature(transaction)
+        else:
+            return Wallet.verify_signature(transaction)
+
     @staticmethod
     def valid_proof(transactions, last_hash, proof):
-        guess         = (str([tx.to_ordered_dict() for tx in transactions]) + str(last_hash) + str(proof)).encode()
-        guess_hash    = hash_string_256(guess)
+        guess = (str([tx.to_ordered_dict() for tx in transactions]
+                     ) + str(last_hash) + str(proof)).encode()
+        guess_hash = hash_string_256(guess)
         print(guess_hash)
         return guess_hash[0:2] == '00'
-    
