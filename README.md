@@ -1,5 +1,5 @@
 # My-Blockchain
-<<<<<<< HEAD
+
 My blockchain project; creating my own cryptocurrency.
 
 ## Usage
