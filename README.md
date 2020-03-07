@@ -1,6 +1,6 @@
 # My-Blockchain
 
-My blockchain project; creating my own cryptocurrency.
+My blockchain project; A blockchain node network.
 
 ## Usage
 
